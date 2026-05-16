@@ -2,57 +2,71 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>TaskFlow - Modern To-Do App</title>
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+    />
+    <title>TaskFlow — Modern To-Do App</title>
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
-    <div class="container">
+    <div class="app">
       <div class="header">
-        <h1>TaskFlow</h1>
-        <p>stay organized, stay productive</p>
+        <h1>tasks</h1>
+        <p>stay focused, stay organized</p>
       </div>
 
-      <!-- Input Section -->
-      <div class="input-section">
+      <div class="input-card">
         <div class="input-group">
-          <input
-            type="text"
-            id="taskInput"
-            placeholder="What needs to be done?"
-          />
-          <button id="addBtn">Add Task</button>
+          <div class="input-wrapper">
+            <input
+              type="text"
+              id="taskInput"
+              placeholder="Add a new task..."
+              autocomplete="off"
+            />
+          </div>
+          <button class="add-btn" id="addBtn">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path d="M12 4v16M4 12h16" />
+            </svg>
+          </button>
         </div>
       </div>
 
-      <!-- Filter Tabs -->
-      <div class="tabs">
-        <button class="tab active" data-filter="all">All</button>
-        <button class="tab" data-filter="active">Active</button>
-        <button class="tab" data-filter="completed">Completed</button>
-        <button class="tab" data-filter="history">History</button>
+      <div class="tabs-container">
+        <button class="tab active" data-filter="all">all</button>
+        <button class="tab" data-filter="active">active</button>
+        <button class="tab" data-filter="completed">completed</button>
+        <button class="tab" data-filter="history">history</button>
       </div>
 
-      <!-- Stats Bar -->
-      <div class="stats-bar">
-        <span id="statsCount">0 tasks</span>
-        <button id="clearCompletedBtn">Clear Completed</button>
+      <div class="stats" id="statsBar">
+        <span class="stats-count" id="statsCount">0 tasks</span>
+        <button class="stats-clear" id="clearCompletedBtn">
+          clear completed
+        </button>
       </div>
 
-      <div class="tasks-container" id="tasksContainer">
-        <!-- Tasks will appear here -->
-      </div>
+      <div class="tasks-container" id="tasksContainer"></div>
     </div>
-    <div id="editModal" class="modal">
-      <div class="modal-content">
-        <h3>Edit Task</h3>
+
+    <!-- Edit Modal -->
+    <div class="modal" id="editModal">
+      <div class="modal-card">
+        <h3>edit task</h3>
         <input type="text" id="editInput" placeholder="Update your task..." />
         <div class="modal-buttons">
-          <button id="closeModalBtn" class="modal-btn modal-btn-cancel">
-            Cancel
+          <button class="modal-btn modal-btn-cancel" id="closeModalBtn">
+            cancel
           </button>
-          <button id="saveEditBtn" class="modal-btn modal-btn-save">
-            Save
+          <button class="modal-btn modal-btn-save" id="saveEditBtn">
+            save
           </button>
         </div>
       </div>
