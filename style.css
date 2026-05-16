@@ -294,3 +294,13 @@ h1 {
 .tab:active {
     transform: scale(0.97);
 }
+
+.task-meta {
+    font-size: 11px;
+    color: #8e8e93;
+    margin-top: 6px;
+}
+
+.task-info {
+    flex: 1;
+}

@@ -380,3 +380,84 @@ document.addEventListener("DOMContentLoaded", () => {
   setupTabs();
   // ... rest of code
 });
+
+// Update getFilteredTasks to include history
+function getFilteredTasks() {
+    if (currentFilter === 'active') {
+        return tasks.filter(t => !t.completed);
+    }
+    if (currentFilter === 'completed') {
+        return tasks.filter(t => t.completed);
+    }
+    if (currentFilter === 'history') {
+        return tasks.filter(t => t.completed);
+    }
+    return tasks;
+}
+
+// Format date for display
+function formatDate(dateString) {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffMs = now - date;
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMs / 3600000);
+    const diffDays = Math.floor(diffMs / 86400000);
+    
+    if (diffMins < 1) return 'just now';
+    if (diffMins < 60) return `${diffMins} minute${diffMins > 1 ? 's' : ''} ago`;
+    if (diffHours < 24) return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
+    if (diffDays < 7) return `${diffDays} day${diffDays > 1 ? 's' : ''} ago`;
+    return date.toLocaleDateString();
+}
+
+// Update renderTasks to show timestamps
+function renderTasks() {
+    if (!tasksContainer) return;
+    
+    const filteredTasks = getFilteredTasks();
+    
+    if (filteredTasks.length === 0) {
+        let message = '';
+        if (currentFilter === 'active') message = 'No active tasks';
+        else if (currentFilter === 'completed') message = 'No completed tasks';
+        else if (currentFilter === 'history') message = 'No task history';
+        else message = 'No tasks yet';
+        
+        tasksContainer.innerHTML = `
+            <div class="empty-state">
+                <p>✨ ${message}</p>
+                <p style="font-size: 12px; margin-top: 8px;">
+                    ${currentFilter === 'all' ? 'Add your first task above' : 'Try another filter'}
+                </p>
+            </div>
+        `;
+        return;
+    }
+    
+    tasksContainer.innerHTML = filteredTasks.map(task => {
+        const dateStr = task.completed && task.completedAt 
+            ? `Completed ${formatDate(task.completedAt)}`
+            : `Created ${formatDate(task.createdAt)}`;
+        
+        return `
+            <div class="task-card ${task.completed ? 'completed' : ''}" data-id="${task.id}">
+                <div class="task-left">
+                    <input type="checkbox" 
+                           class="task-checkbox" 
+                           ${task.completed ? 'checked' : ''} 
+                           onchange="toggleComplete(${task.id})">
+                    <div class="task-info">
+                        <div class="task-title">${escapeHtml(task.title)}</div>
+                        <div class="task-meta">🕐 ${dateStr}</div>
+                    </div>
+                </div>
+                <div class="task-actions">
+                    <button class="edit-btn" onclick="editTask(${task.id})">Edit</button>
+                    <button class="delete-btn" onclick="deleteTask(${task.id})">Delete</button>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
