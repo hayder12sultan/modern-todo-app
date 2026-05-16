@@ -128,3 +128,23 @@ h1 {
     font-size: 14px;
 }
 
+.delete-btn {
+    background: #ff3b30;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.delete-btn:active {
+    transform: scale(0.95);
+}
+
+.task-actions {
+    display: flex;
+    gap: 8px;
+}

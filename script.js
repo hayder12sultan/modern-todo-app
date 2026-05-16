@@ -118,3 +118,38 @@ document.addEventListener('DOMContentLoaded', () => {
     
     console.log('App initialized with', tasks.length, 'tasks');
 });
+
+// Delete task
+function deleteTask(id) {
+    if (confirm('Delete this task?')) {
+        const taskCount = tasks.length;
+        tasks = tasks.filter(task => task.id !== id);
+        saveTasks();
+        renderTasks();
+        console.log(`Task deleted. ${tasks.length}/${taskCount} tasks remaining`);
+    }
+}
+
+// Update renderTasks function
+function renderTasks() {
+    if (!tasksContainer) return;
+    
+    if (tasks.length === 0) {
+        tasksContainer.innerHTML = `
+            <div class="empty-state">
+                <p>✨ No tasks yet</p>
+                <p style="font-size: 12px; margin-top: 8px;">Add your first task above</p>
+            </div>
+        `;
+        return;
+    }
+    
+    tasksContainer.innerHTML = tasks.map(task => `
+        <div class="task-card" data-id="${task.id}">
+            <span class="task-title">${escapeHtml(task.title)}</span>
+            <div class="task-actions">
+                <button class="delete-btn" onclick="deleteTask(${task.id})">Delete</button>
+            </div>
+        </div>
+    `).join('');
+}
