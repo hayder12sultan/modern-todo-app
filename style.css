@@ -2,164 +2,259 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
 }
 
 body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'SF Pro Text', 'SF Pro Display', system-ui, Helvetica, Arial, sans-serif;
     background: #f5f5f7;
-    padding: 20px;
+    padding: 16px;
+    padding-bottom: 32px;
+    min-height: 100vh;
 }
 
-.container {
-    max-width: 600px;
+/* Main container */
+.app {
+    max-width: 680px;
     margin: 0 auto;
-    background: white;
-    border-radius: 20px;
-    padding: 20px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
 }
 
-h1 {
-    font-size: 28px;
-    margin-bottom: 10px;
+/* Header Section */
+.header {
+    margin-bottom: 24px;
+    animation: fadeSlideDown 0.4s ease-out;
+}
+
+.header h1 {
+    font-size: 34px;
+    font-weight: 700;
     background: linear-gradient(135deg, #1a1a1a 0%, #3a3a3a 100%);
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
-}
-
-/* Existing styles plus: */
-
-.header {
-    margin-bottom: 30px;
+    letter-spacing: -0.5px;
+    margin-bottom: 8px;
 }
 
 .header p {
     color: #8e8e93;
-    font-size: 14px;
-    margin-top: 5px;
+    font-size: 15px;
+    font-weight: 400;
 }
 
-.input-section {
-    margin-bottom: 30px;
+/* Input Card */
+.input-card {
+    background: white;
+    border-radius: 20px;
+    padding: 20px;
+    margin-bottom: 24px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+    transition: all 0.2s ease;
 }
 
 .input-group {
     display: flex;
     gap: 12px;
+    align-items: center;
 }
 
-.input-group input {
+.input-wrapper {
     flex: 1;
+    position: relative;
+}
+
+.input-wrapper input {
+    width: 100%;
     padding: 14px 16px;
     border: 1.5px solid #e5e5ea;
-    border-radius: 12px;
+    border-radius: 14px;
     font-size: 16px;
     font-family: inherit;
     transition: all 0.2s;
     background: #fafafc;
+    color: #1c1c1e;
 }
 
-.input-group input:focus {
+.input-wrapper input:focus {
     outline: none;
     border-color: #007aff;
     background: white;
     box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
 }
 
-.input-group button {
-    padding: 14px 24px;
-    background: #007aff;
-    color: white;
-    border: none;
-    border-radius: 12px;
-    font-size: 16px;
-    font-weight: 600;
-    font-family: inherit;
-    cursor: pointer;
-    transition: all 0.2s;
+.input-wrapper input::placeholder {
+    color: #c6c6c8;
 }
 
-.input-group button:active {
+.add-btn {
+    background: #007aff;
+    border: none;
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    flex-shrink: 0;
+}
+
+.add-btn:hover {
+    background: #005fc1;
     transform: scale(0.98);
 }
 
-.tasks-container {
-    margin-top: 20px;
+.add-btn svg {
+    width: 24px;
+    height: 24px;
+    stroke: white;
+    stroke-width: 2;
 }
 
-/* Task Item Styles */
-.task-card {
-    background: #f8f9fa;
+/* Tabs - Better on mobile */
+.tabs-container {
+    background: white;
+    border-radius: 16px;
+    padding: 6px;
+    margin-bottom: 24px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+}
+
+.tabs-container::-webkit-scrollbar {
+    display: none;
+}
+
+.tab {
+    flex: 1;
+    padding: 12px 8px;
+    background: transparent;
+    border: none;
+    font-size: 15px;
+    font-weight: 500;
+    font-family: inherit;
     border-radius: 12px;
-    padding: 16px;
-    margin-bottom: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+    color: #8e8e93;
+    white-space: nowrap;
+}
+
+.tab.active {
+    background: #007aff;
+    color: white;
+    box-shadow: 0 2px 6px rgba(0, 122, 255, 0.2);
+}
+
+/* Stats Bar */
+.stats {
+    background: white;
+    border-radius: 16px;
+    padding: 14px 20px;
+    margin-bottom: 20px;
     display: flex;
     justify-content: space-between;
-    align-items: center;
-    transition: all 0.2s;
-    animation: fadeIn 0.3s ease-out;
+    align-items: baseline;
+    font-size: 14px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
 }
 
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+.stats-count {
+    color: #8e8e93;
+}
+
+.stats-clear {
+    background: none;
+    border: none;
+    color: #ff3b30;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    padding: 6px 12px;
+    border-radius: 10px;
+    transition: all 0.2s;
+}
+
+.stats-clear:active {
+    background: #ffebee;
+}
+
+/* Task List */
+.tasks-container {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+/* Task Card */
+.task-card {
+    background: white;
+    border-radius: 16px;
+    padding: 16px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    transition: all 0.25s ease;
+    animation: fadeInUp 0.3s ease-out;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+    border: 1px solid rgba(0, 0, 0, 0.03);
+}
+
+.task-card:active {
+    transform: scale(0.99);
+}
+
+/* Custom Checkbox */
+.checkbox {
+    width: 24px;
+    height: 24px;
+    border-radius: 8px;
+    border: 2px solid #c6c6c8;
+    background: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    flex-shrink: 0;
+}
+
+.checkbox.completed {
+    background: #34c759;
+    border-color: #34c759;
+}
+
+.checkbox svg {
+    width: 14px;
+    height: 14px;
+    stroke: white;
+    stroke-width: 3;
+    display: none;
+}
+
+.checkbox.completed svg {
+    display: block;
+}
+
+/* Task Content */
+.task-content {
+    flex: 1;
+    min-width: 0;
 }
 
 .task-title {
     font-size: 16px;
+    font-weight: 500;
     color: #1c1c1e;
-    font-weight: 500;
-}
-
-.empty-state {
-    text-align: center;
-    padding: 40px 20px;
-    color: #8e8e93;
-}
-
-.empty-state p {
-    font-size: 14px;
-}
-
-.delete-btn {
-    background: #ff3b30;
-    color: white;
-    border: none;
-    padding: 8px 16px;
-    border-radius: 8px;
-    font-size: 13px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.2s;
-}
-
-.delete-btn:active {
-    transform: scale(0.95);
-}
-
-.task-actions {
-    display: flex;
-    gap: 8px;
-}
-
-.task-left {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    flex: 1;
-}
-
-.task-checkbox {
-    width: 22px;
-    height: 22px;
-    cursor: pointer;
+    margin-bottom: 6px;
+    word-break: break-word;
+    line-height: 1.4;
 }
 
 .task-card.completed .task-title {
@@ -167,7 +262,75 @@ h1 {
     color: #8e8e93;
 }
 
-/* Modal Styles */
+.task-meta {
+    font-size: 12px;
+    color: #8e8e93;
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.task-meta span {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+/* Action Buttons */
+.task-actions {
+    display: flex;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.icon-btn {
+    background: transparent;
+    border: none;
+    padding: 8px;
+    border-radius: 10px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    color: #8e8e93;
+}
+
+.icon-btn:active {
+    background: #f2f2f6;
+    transform: scale(0.92);
+}
+
+.edit-btn:hover { color: #007aff; }
+.delete-btn:hover { color: #ff3b30; }
+
+/* Empty State */
+.empty-state {
+    background: white;
+    border-radius: 20px;
+    padding: 48px 24px;
+    text-align: center;
+    color: #c6c6c8;
+}
+
+.empty-state svg {
+    margin-bottom: 16px;
+    opacity: 0.5;
+}
+
+.empty-state h3 {
+    font-size: 18px;
+    font-weight: 500;
+    color: #8e8e93;
+    margin-bottom: 8px;
+}
+
+.empty-state p {
+    font-size: 14px;
+    color: #aeaeb2;
+}
+
+/* Modal */
 .modal {
     display: none;
     position: fixed;
@@ -176,48 +339,45 @@ h1 {
     right: 0;
     bottom: 0;
     background: rgba(0, 0, 0, 0.5);
-    backdrop-filter: blur(4px);
-    justify-content: center;
-    align-items: center;
+    backdrop-filter: blur(8px);
     z-index: 1000;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
 }
 
-.modal-content {
+.modal.active {
+    display: flex;
+}
+
+.modal-card {
     background: white;
-    border-radius: 20px;
+    border-radius: 24px;
     padding: 24px;
-    width: 90%;
+    width: 100%;
     max-width: 400px;
-    animation: modalSlideIn 0.2s ease-out;
+    animation: scaleIn 0.2s ease-out;
 }
 
-@keyframes modalSlideIn {
-    from {
-        opacity: 0;
-        transform: scale(0.95);
-    }
-    to {
-        opacity: 1;
-        transform: scale(1);
-    }
-}
-
-.modal-content h3 {
+.modal-card h3 {
+    font-size: 20px;
+    font-weight: 600;
     margin-bottom: 20px;
     color: #1c1c1e;
 }
 
-.modal-content input {
+.modal-card input {
     width: 100%;
-    padding: 12px;
+    padding: 14px;
     border: 1.5px solid #e5e5ea;
-    border-radius: 10px;
+    border-radius: 14px;
     font-size: 16px;
-    margin-bottom: 20px;
     font-family: inherit;
+    margin-bottom: 24px;
+    background: #fafafc;
 }
 
-.modal-content input:focus {
+.modal-card input:focus {
     outline: none;
     border-color: #007aff;
 }
@@ -230,12 +390,13 @@ h1 {
 
 .modal-btn {
     padding: 10px 20px;
-    border-radius: 10px;
-    font-size: 14px;
+    border-radius: 12px;
+    font-size: 15px;
     font-weight: 500;
+    font-family: inherit;
     border: none;
     cursor: pointer;
-    font-family: inherit;
+    transition: all 0.2s;
 }
 
 .modal-btn-cancel {
@@ -248,98 +409,11 @@ h1 {
     color: white;
 }
 
-.edit-btn {
-    background: #007aff;
-    color: white;
-    border: none;
-    padding: 8px 16px;
-    border-radius: 8px;
-    font-size: 13px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.2s;
-    margin-right: 8px;
-}
-
-.edit-btn:active {
-    transform: scale(0.95);
-}
-
-/* Tabs Styles */
-.tabs {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 24px;
-}
-
-.tab {
-    flex: 1;
-    padding: 10px;
-    background: #f8f9fa;
-    border: none;
-    border-radius: 10px;
-    font-size: 14px;
-    font-weight: 500;
-    font-family: inherit;
-    cursor: pointer;
-    transition: all 0.2s;
-    color: #8e8e93;
-}
-
-.tab.active {
-    background: #007aff;
-    color: white;
-}
-
-.tab:active {
-    transform: scale(0.97);
-}
-
-.task-meta {
-    font-size: 11px;
-    color: #8e8e93;
-    margin-top: 6px;
-}
-
-.task-info {
-    flex: 1;
-}
-
-/* Stats Bar */
-.stats-bar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 16px 0;
-    margin-bottom: 20px;
-    border-top: 1px solid #e5e5ea;
-    border-bottom: 1px solid #e5e5ea;
-}
-
-#statsCount {
-    font-size: 14px;
-    color: #8e8e93;
-    font-weight: 500;
-}
-
-#clearCompletedBtn {
-    background: none;
-    border: none;
-    color: #ff3b30;
-    font-size: 14px;
-    font-weight: 500;
-    cursor: pointer;
-    padding: 8px 12px;
-    border-radius: 8px;
-    transition: all 0.2s;
-}
-
-#clearCompletedBtn:active {
-    background: #ffebee;
+.modal-btn:active {
     transform: scale(0.96);
 }
 
-/* Toast Notifications */
+/* Toast */
 .toast {
     position: fixed;
     bottom: 24px;
@@ -353,11 +427,45 @@ h1 {
     font-weight: 500;
     z-index: 1100;
     white-space: nowrap;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    animation: toastSlideUp 0.3s ease-out;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    animation: slideUp 0.3s ease-out;
 }
 
-@keyframes toastSlideUp {
+/* Animations */
+@keyframes fadeSlideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes scaleIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes slideUp {
     from {
         opacity: 0;
         transform: translateX(-50%) translateY(20px);
@@ -368,51 +476,28 @@ h1 {
     }
 }
 
-/* Mobile Responsiveness */
-@media (max-width: 600px) {
+/* Mobile Optimizations */
+@media (max-width: 480px) {
     body {
         padding: 12px;
     }
     
-    .container {
-        padding: 16px;
-    }
-    
-    .input-group {
-        flex-direction: column;
-    }
-    
-    .input-group button {
-        width: 100%;
-    }
-    
     .task-card {
-        flex-wrap: wrap;
+        padding: 14px;
     }
     
-    .task-left {
-        width: 100%;
-        margin-bottom: 12px;
-    }
-    
-    .task-actions {
-        width: 100%;
-        justify-content: flex-end;
-    }
-    
-    .tabs {
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
+    .task-title {
+        font-size: 15px;
     }
     
     .tab {
-        white-space: nowrap;
-        flex: none;
-        padding: 10px 16px;
+        font-size: 13px;
+        padding: 10px 6px;
     }
     
-    .stats-bar {
+    .stats {
         font-size: 13px;
+        padding: 12px 16px;
     }
     
     .toast {

@@ -1,652 +1,219 @@
-// Task data structure
+// Task class
+class Task {
+    constructor(id, title, completed = false, createdAt = new Date(), completedAt = null) {
+        this.id = id;
+        this.title = title;
+        this.completed = completed;
+        this.createdAt = new Date(createdAt);
+        this.completedAt = completedAt ? new Date(completedAt) : null;
+    }
+}
+
 let tasks = [];
-
-// DOM elements
-let taskInput;
-let addBtn;
-let tasksContainer;
-
-// Load tasks from localStorage
-function loadTasks() {
-  const stored = localStorage.getItem("taskflow_tasks");
-  if (stored) {
-    tasks = JSON.parse(stored);
-    console.log(`Loaded ${tasks.length} tasks from storage`);
-  } else {
-    console.log("No saved tasks found, starting fresh");
-  }
-}
-
-// Save tasks to localStorage
-function saveTasks() {
-  localStorage.setItem("taskflow_tasks", JSON.stringify(tasks));
-  console.log(`Saved ${tasks.length} tasks to storage`);
-}
-
-// Initialize app
-document.addEventListener("DOMContentLoaded", () => {
-  // Get DOM elements
-  taskInput = document.getElementById("taskInput");
-  addBtn = document.getElementById("addBtn");
-  tasksContainer = document.getElementById("tasksContainer");
-
-  // Load existing tasks
-  loadTasks();
-
-  console.log("App initialized with", tasks.length, "tasks");
-});
-
-// Add new task
-function addTask() {
-  const title = taskInput.value.trim();
-
-  if (!title) {
-    alert("Please enter a task");
-    return;
-  }
-
-  const newTask = {
-    id: Date.now(),
-    title: title,
-    completed: false,
-    createdAt: new Date().toISOString(),
-    completedAt: null,
-  };
-
-  tasks.unshift(newTask); // Add to beginning of array
-  saveTasks();
-  renderTasks();
-
-  taskInput.value = "";
-  taskInput.focus();
-
-  console.log("Task added:", newTask);
-}
-
-// Render tasks to UI
-function renderTasks() {
-  if (!tasksContainer) return;
-
-  if (tasks.length === 0) {
-    tasksContainer.innerHTML = `
-            <div class="empty-state">
-                <p>✨ No tasks yet</p>
-                <p style="font-size: 12px; margin-top: 8px;">Add your first task above</p>
-            </div>
-        `;
-    return;
-  }
-
-  tasksContainer.innerHTML = tasks
-    .map(
-      (task) => `
-        <div class="task-card" data-id="${task.id}">
-            <span class="task-title">${escapeHtml(task.title)}</span>
-        </div>
-    `,
-    )
-    .join("");
-}
-
-// Helper function to escape HTML
-function escapeHtml(text) {
-  const div = document.createElement("div");
-  div.textContent = text;
-  return div.innerHTML;
-}
-
-// Set up event listeners
-function setupEventListeners() {
-  addBtn.addEventListener("click", addTask);
-  taskInput.addEventListener("keypress", (e) => {
-    if (e.key === "Enter") addTask();
-  });
-}
-
-// Update DOMContentLoaded event listener
-document.addEventListener("DOMContentLoaded", () => {
-  // Get DOM elements
-  taskInput = document.getElementById("taskInput");
-  addBtn = document.getElementById("addBtn");
-  tasksContainer = document.getElementById("tasksContainer");
-
-  // Load existing tasks
-  loadTasks();
-
-  // Set up event listeners
-  setupEventListeners();
-
-  // Initial render
-  renderTasks();
-
-  console.log("App initialized with", tasks.length, "tasks");
-});
-
-// Delete task
-function deleteTask(id) {
-  if (confirm("Delete this task?")) {
-    const taskCount = tasks.length;
-    tasks = tasks.filter((task) => task.id !== id);
-    saveTasks();
-    renderTasks();
-    console.log(`Task deleted. ${tasks.length}/${taskCount} tasks remaining`);
-  }
-}
-
-// Update renderTasks function
-function renderTasks() {
-  if (!tasksContainer) return;
-
-  if (tasks.length === 0) {
-    tasksContainer.innerHTML = `
-            <div class="empty-state">
-                <p>✨ No tasks yet</p>
-                <p style="font-size: 12px; margin-top: 8px;">Add your first task above</p>
-            </div>
-        `;
-    return;
-  }
-
-  tasksContainer.innerHTML = tasks
-    .map(
-      (task) => `
-        <div class="task-card" data-id="${task.id}">
-            <span class="task-title">${escapeHtml(task.title)}</span>
-            <div class="task-actions">
-                <button class="delete-btn" onclick="deleteTask(${task.id})">Delete</button>
-            </div>
-        </div>
-    `,
-    )
-    .join("");
-}
-
-// Toggle complete status
-function toggleComplete(id) {
-  const task = tasks.find((t) => t.id === id);
-  if (task) {
-    task.completed = !task.completed;
-    task.completedAt = task.completed ? new Date().toISOString() : null;
-    saveTasks();
-    renderTasks();
-    console.log(
-      "Task toggled:",
-      task.title,
-      task.completed ? "completed" : "active",
-    );
-  }
-}
-
-// Update renderTasks function
-function renderTasks() {
-  if (!tasksContainer) return;
-
-  if (tasks.length === 0) {
-    tasksContainer.innerHTML = `
-            <div class="empty-state">
-                <p>✨ No tasks yet</p>
-                <p style="font-size: 12px; margin-top: 8px;">Add your first task above</p>
-            </div>
-        `;
-    return;
-  }
-
-  tasksContainer.innerHTML = tasks
-    .map(
-      (task) => `
-        <div class="task-card ${task.completed ? "completed" : ""}" data-id="${task.id}">
-            <div class="task-left">
-                <input type="checkbox" 
-                       class="task-checkbox" 
-                       ${task.completed ? "checked" : ""} 
-                       onchange="toggleComplete(${task.id})">
-                <span class="task-title">${escapeHtml(task.title)}</span>
-            </div>
-            <div class="task-actions">
-                <button class="delete-btn" onclick="deleteTask(${task.id})">Delete</button>
-            </div>
-        </div>
-    `,
-    )
-    .join("");
-}
-
+let currentFilter = 'all';
 let editingTaskId = null;
-let editModal, editInput, closeModalBtn, saveEditBtn;
 
-// Edit task
-function editTask(id) {
-  const task = tasks.find((t) => t.id === id);
-  if (task) {
-    editingTaskId = id;
-    editInput.value = task.title;
-    editModal.style.display = "flex";
-  }
+// Load from localStorage
+function loadTasks() {
+    const stored = localStorage.getItem('taskflow_data');
+    if (stored) {
+        const parsed = JSON.parse(stored);
+        tasks = parsed.map(t => new Task(t.id, t.title, t.completed, t.createdAt, t.completedAt));
+    } else {
+        tasks = [
+            new Task(Date.now() + 1, 'design handoff', false, new Date()),
+            new Task(Date.now() + 2, 'update documentation', true, new Date(), new Date()),
+            new Task(Date.now() + 3, 'review pull requests', false, new Date())
+        ];
+    }
+    render();
 }
 
-// Save edit
-function saveEdit() {
-  const newTitle = editInput.value.trim();
-  if (!newTitle) {
-    alert("Task title cannot be empty");
-    return;
-  }
+function saveTasks() {
+    localStorage.setItem('taskflow_data', JSON.stringify(tasks));
+}
 
-  const task = tasks.find((t) => t.id === editingTaskId);
-  if (task) {
-    task.title = newTitle;
+function addTask() {
+    const input = document.getElementById('taskInput');
+    const title = input.value.trim();
+    if (!title) {
+        showToast('please enter a task');
+        return;
+    }
+    const newTask = new Task(Date.now(), title);
+    tasks.unshift(newTask);
     saveTasks();
-    renderTasks();
-    console.log("Task updated:", task);
-  }
-  closeModal();
+    input.value = '';
+    render();
+    showToast('task added');
 }
 
-// Close modal
+function deleteTask(id) {
+    tasks = tasks.filter(t => t.id !== id);
+    saveTasks();
+    render();
+    showToast('task deleted');
+}
+
+function toggleComplete(id) {
+    const task = tasks.find(t => t.id === id);
+    if (task) {
+        task.completed = !task.completed;
+        task.completedAt = task.completed ? new Date() : null;
+        saveTasks();
+        render();
+        showToast(task.completed ? 'completed ✓' : 'marked active');
+    }
+}
+
+function editTask(id) {
+    const task = tasks.find(t => t.id === id);
+    if (task) {
+        editingTaskId = id;
+        document.getElementById('editInput').value = task.title;
+        document.getElementById('editModal').classList.add('active');
+    }
+}
+
+function saveEdit() {
+    const newTitle = document.getElementById('editInput').value.trim();
+    if (!newTitle) {
+        showToast('task cannot be empty');
+        return;
+    }
+    const task = tasks.find(t => t.id === editingTaskId);
+    if (task) {
+        task.title = newTitle;
+        saveTasks();
+        render();
+        showToast('task updated');
+    }
+    closeModal();
+}
+
 function closeModal() {
-  editModal.style.display = "none";
-  editingTaskId = null;
-  editInput.value = "";
+    document.getElementById('editModal').classList.remove('active');
+    editingTaskId = null;
 }
 
-// Update renderTasks to include edit button
-function renderTasks() {
-  // ... existing code
-  tasksContainer.innerHTML = tasks
-    .map(
-      (task) => `
-        <div class="task-card ${task.completed ? "completed" : ""}" data-id="${task.id}">
-            <div class="task-left">
-                <input type="checkbox" 
-                       class="task-checkbox" 
-                       ${task.completed ? "checked" : ""} 
-                       onchange="toggleComplete(${task.id})">
-                <span class="task-title">${escapeHtml(task.title)}</span>
-            </div>
-            <div class="task-actions">
-                <button class="edit-btn" onclick="editTask(${task.id})">Edit</button>
-                <button class="delete-btn" onclick="deleteTask(${task.id})">Delete</button>
-            </div>
-        </div>
-    `,
-    )
-    .join("");
+function clearCompleted() {
+    const completedTasks = tasks.filter(t => t.completed);
+    if (completedTasks.length === 0) {
+        showToast('no completed tasks');
+        return;
+    }
+    tasks = tasks.filter(t => !t.completed);
+    saveTasks();
+    render();
+    showToast(`cleared ${completedTasks.length} task${completedTasks.length > 1 ? 's' : ''}`);
 }
 
-// Update DOMContentLoaded
-document.addEventListener("DOMContentLoaded", () => {
-  // Get DOM elements
-  taskInput = document.getElementById("taskInput");
-  addBtn = document.getElementById("addBtn");
-  tasksContainer = document.getElementById("tasksContainer");
-  editModal = document.getElementById("editModal");
-  editInput = document.getElementById("editInput");
-  closeModalBtn = document.getElementById("closeModalBtn");
-  saveEditBtn = document.getElementById("saveEditBtn");
-
-  // Load existing tasks
-  loadTasks();
-
-  // Set up event listeners
-  setupEventListeners();
-
-  // Modal event listeners
-  closeModalBtn.addEventListener("click", closeModal);
-  saveEditBtn.addEventListener("click", saveEdit);
-  editModal.addEventListener("click", (e) => {
-    if (e.target === editModal) closeModal();
-  });
-
-  // Initial render
-  renderTasks();
-
-  console.log("App initialized with", tasks.length, "tasks");
-});
-
-let currentFilter = "all";
-
-// Get filtered tasks based on current filter
-function getFilteredTasks() {
-  if (currentFilter === "active") {
-    return tasks.filter((t) => !t.completed);
-  }
-  if (currentFilter === "completed") {
-    return tasks.filter((t) => t.completed);
-  }
-  return tasks;
+function formatRelativeTime(date) {
+    if (!date) return '';
+    const now = new Date();
+    const diff = Math.floor((now - date) / 1000);
+    
+    if (diff < 60) return 'just now';
+    if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
+    if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
+    if (diff < 604800) return `${Math.floor(diff / 86400)}d ago`;
+    return date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
 }
 
-// Update renderTasks to use filtered tasks
-function renderTasks() {
-  if (!tasksContainer) return;
+function showToast(message) {
+    const existing = document.querySelector('.toast');
+    if (existing) existing.remove();
+    
+    const toast = document.createElement('div');
+    toast.className = 'toast';
+    toast.textContent = message;
+    document.body.appendChild(toast);
+    
+    setTimeout(() => {
+        toast.style.opacity = '0';
+        setTimeout(() => toast.remove(), 300);
+    }, 2000);
+}
 
-  const filteredTasks = getFilteredTasks();
-
-  if (filteredTasks.length === 0) {
-    let message = "";
-    if (currentFilter === "active") message = "No active tasks";
-    else if (currentFilter === "completed") message = "No completed tasks";
-    else message = "No tasks yet";
-
-    tasksContainer.innerHTML = `
+function render() {
+    let filtered = [];
+    if (currentFilter === 'all') filtered = tasks;
+    else if (currentFilter === 'active') filtered = tasks.filter(t => !t.completed);
+    else if (currentFilter === 'completed') filtered = tasks.filter(t => t.completed);
+    else if (currentFilter === 'history') filtered = tasks.filter(t => t.completed);
+    
+    const statsCount = document.getElementById('statsCount');
+    const activeCount = tasks.filter(t => !t.completed).length;
+    statsCount.textContent = `${activeCount} active ${activeCount === 1 ? 'task' : 'tasks'}`;
+    
+    const container = document.getElementById('tasksContainer');
+    
+    if (filtered.length === 0) {
+        container.innerHTML = `
             <div class="empty-state">
-                <p>✨ ${message}</p>
-                <p style="font-size: 12px; margin-top: 8px;">
-                    ${currentFilter === "all" ? "Add your first task above" : "Try another filter"}
-                </p>
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
+                </svg>
+                <h3>no tasks</h3>
+                <p>${currentFilter === 'history' ? 'completed tasks will appear here' : 'create your first task above'}</p>
             </div>
         `;
-    return;
-  }
-
-  tasksContainer.innerHTML = filteredTasks
-    .map(
-      (task) => `
-        <div class="task-card ${task.completed ? "completed" : ""}" data-id="${task.id}">
-            <div class="task-left">
-                <input type="checkbox" 
-                       class="task-checkbox" 
-                       ${task.completed ? "checked" : ""} 
-                       onchange="toggleComplete(${task.id})">
-                <span class="task-title">${escapeHtml(task.title)}</span>
-            </div>
-            <div class="task-actions">
-                <button class="edit-btn" onclick="editTask(${task.id})">Edit</button>
-                <button class="delete-btn" onclick="deleteTask(${task.id})">Delete</button>
-            </div>
-        </div>
-    `,
-    )
-    .join("");
-}
-
-// Set up tab switching
-function setupTabs() {
-  const tabs = document.querySelectorAll(".tab");
-  tabs.forEach((tab) => {
-    tab.addEventListener("click", () => {
-      tabs.forEach((t) => t.classList.remove("active"));
-      tab.classList.add("active");
-      currentFilter = tab.dataset.filter;
-      renderTasks();
-      console.log("Filter changed to:", currentFilter);
-    });
-  });
-}
-
-// Update DOMContentLoaded to include setupTabs
-document.addEventListener("DOMContentLoaded", () => {
-  // ... existing code
-  setupTabs();
-  // ... rest of code
-});
-
-// Update getFilteredTasks to include history
-function getFilteredTasks() {
-  if (currentFilter === "active") {
-    return tasks.filter((t) => !t.completed);
-  }
-  if (currentFilter === "completed") {
-    return tasks.filter((t) => t.completed);
-  }
-  if (currentFilter === "history") {
-    return tasks.filter((t) => t.completed);
-  }
-  return tasks;
-}
-
-// Format date for display
-function formatDate(dateString) {
-  if (!dateString) return "";
-  const date = new Date(dateString);
-  const now = new Date();
-  const diffMs = now - date;
-  const diffMins = Math.floor(diffMs / 60000);
-  const diffHours = Math.floor(diffMs / 3600000);
-  const diffDays = Math.floor(diffMs / 86400000);
-
-  if (diffMins < 1) return "just now";
-  if (diffMins < 60) return `${diffMins} minute${diffMins > 1 ? "s" : ""} ago`;
-  if (diffHours < 24) return `${diffHours} hour${diffHours > 1 ? "s" : ""} ago`;
-  if (diffDays < 7) return `${diffDays} day${diffDays > 1 ? "s" : ""} ago`;
-  return date.toLocaleDateString();
-}
-
-// Update renderTasks to show timestamps
-function renderTasks() {
-  if (!tasksContainer) return;
-
-  const filteredTasks = getFilteredTasks();
-
-  if (filteredTasks.length === 0) {
-    let message = "";
-    if (currentFilter === "active") message = "No active tasks";
-    else if (currentFilter === "completed") message = "No completed tasks";
-    else if (currentFilter === "history") message = "No task history";
-    else message = "No tasks yet";
-
-    tasksContainer.innerHTML = `
-            <div class="empty-state">
-                <p>✨ ${message}</p>
-                <p style="font-size: 12px; margin-top: 8px;">
-                    ${currentFilter === "all" ? "Add your first task above" : "Try another filter"}
-                </p>
-            </div>
-        `;
-    return;
-  }
-
-  tasksContainer.innerHTML = filteredTasks
-    .map((task) => {
-      const dateStr =
-        task.completed && task.completedAt
-          ? `Completed ${formatDate(task.completedAt)}`
-          : `Created ${formatDate(task.createdAt)}`;
-
-      return `
-            <div class="task-card ${task.completed ? "completed" : ""}" data-id="${task.id}">
-                <div class="task-left">
-                    <input type="checkbox" 
-                           class="task-checkbox" 
-                           ${task.completed ? "checked" : ""} 
-                           onchange="toggleComplete(${task.id})">
-                    <div class="task-info">
-                        <div class="task-title">${escapeHtml(task.title)}</div>
-                        <div class="task-meta">🕐 ${dateStr}</div>
+        return;
+    }
+    
+    container.innerHTML = filtered.map(task => {
+        const dateStr = task.completed && task.completedAt 
+            ? `completed ${formatRelativeTime(task.completedAt)}`
+            : `created ${formatRelativeTime(new Date(task.createdAt))}`;
+        
+        return `
+            <div class="task-card ${task.completed ? 'completed' : ''}">
+                <div class="checkbox ${task.completed ? 'completed' : ''}" onclick="toggleComplete(${task.id})">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path d="M20 6L9 17L4 12" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+                <div class="task-content">
+                    <div class="task-title">${escapeHtml(task.title)}</div>
+                    <div class="task-meta">
+                        <span>🕐 ${dateStr}</span>
                     </div>
                 </div>
                 <div class="task-actions">
-                    <button class="edit-btn" onclick="editTask(${task.id})">Edit</button>
-                    <button class="delete-btn" onclick="deleteTask(${task.id})">Delete</button>
+                    <button class="icon-btn edit-btn" onclick="editTask(${task.id})">✏️</button>
+                    <button class="icon-btn delete-btn" onclick="deleteTask(${task.id})">🗑️</button>
                 </div>
             </div>
         `;
-    })
-    .join("");
+    }).join('');
 }
 
-let statsCount, clearCompletedBtn;
-
-// Update statistics
-function updateStats() {
-  const activeCount = tasks.filter((t) => !t.completed).length;
-  const totalCount = tasks.length;
-  statsCount.textContent = `${activeCount} active of ${totalCount} total`;
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
 }
 
-// Clear all completed tasks
-function clearCompleted() {
-  const completedTasks = tasks.filter((t) => t.completed);
+// Event listeners
+document.getElementById('addBtn').addEventListener('click', addTask);
+document.getElementById('taskInput').addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') addTask();
+});
+document.getElementById('closeModalBtn').addEventListener('click', closeModal);
+document.getElementById('saveEditBtn').addEventListener('click', saveEdit);
+document.getElementById('clearCompletedBtn').addEventListener('click', clearCompleted);
 
-  if (completedTasks.length === 0) {
-    alert("No completed tasks to clear");
-    return;
-  }
-
-  if (
-    confirm(
-      `Delete ${completedTasks.length} completed task${completedTasks.length > 1 ? "s" : ""}?`,
-    )
-  ) {
-    tasks = tasks.filter((t) => !t.completed);
-    saveTasks();
-    renderTasks();
-    updateStats();
-    console.log(`Cleared ${completedTasks.length} completed tasks`);
-  }
-}
-
-// Update renderTasks to call updateStats
-function renderTasks() {
-  // ... existing render code
-  updateStats(); // Add this line
-}
-
-// Update DOMContentLoaded
-document.addEventListener("DOMContentLoaded", () => {
-  // Get DOM elements
-  taskInput = document.getElementById("taskInput");
-  addBtn = document.getElementById("addBtn");
-  tasksContainer = document.getElementById("tasksContainer");
-  editModal = document.getElementById("editModal");
-  editInput = document.getElementById("editInput");
-  closeModalBtn = document.getElementById("closeModalBtn");
-  saveEditBtn = document.getElementById("saveEditBtn");
-  statsCount = document.getElementById("statsCount");
-  clearCompletedBtn = document.getElementById("clearCompletedBtn");
-
-  // Load existing tasks
-  loadTasks();
-
-  // Set up event listeners
-  setupEventListeners();
-  setupTabs();
-
-  // Modal event listeners
-  closeModalBtn.addEventListener("click", closeModal);
-  saveEditBtn.addEventListener("click", saveEdit);
-  editModal.addEventListener("click", (e) => {
-    if (e.target === editModal) closeModal();
-  });
-
-  // Clear completed button
-  clearCompletedBtn.addEventListener("click", clearCompleted);
-
-  // Initial render
-  renderTasks();
-
-  console.log("App initialized with", tasks.length, "tasks");
+document.getElementById('editModal').addEventListener('click', (e) => {
+    if (e.target === document.getElementById('editModal')) closeModal();
 });
 
-// Show toast notification
-function showToast(message, duration = 2000) {
-  const existingToast = document.querySelector(".toast");
-  if (existingToast) existingToast.remove();
+document.querySelectorAll('.tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        currentFilter = tab.dataset.filter;
+        render();
+    });
+});
 
-  const toast = document.createElement("div");
-  toast.className = "toast";
-  toast.textContent = message;
-  document.body.appendChild(toast);
-
-  setTimeout(() => {
-    toast.style.opacity = "0";
-    setTimeout(() => toast.remove(), 300);
-  }, duration);
-}
-
-// Add toast to all functions
-function addTask() {
-  const title = taskInput.value.trim();
-
-  if (!title) {
-    showToast("Please enter a task", 1500);
-    return;
-  }
-
-  const newTask = {
-    id: Date.now(),
-    title: title,
-    completed: false,
-    createdAt: new Date().toISOString(),
-    completedAt: null,
-  };
-
-  tasks.unshift(newTask);
-  saveTasks();
-  renderTasks();
-
-  taskInput.value = "";
-  taskInput.focus();
-
-  showToast("✓ Task added");
-  console.log("Task added:", newTask);
-}
-
-function deleteTask(id) {
-  const task = tasks.find((t) => t.id === id);
-  if (confirm("Delete this task?")) {
-    tasks = tasks.filter((task) => task.id !== id);
-    saveTasks();
-    renderTasks();
-    showToast(`🗑 Deleted "${task.title.substring(0, 30)}"`);
-    console.log(`Task deleted.`);
-  }
-}
-
-function toggleComplete(id) {
-  const task = tasks.find((t) => t.id === id);
-  if (task) {
-    task.completed = !task.completed;
-    task.completedAt = task.completed ? new Date().toISOString() : null;
-    saveTasks();
-    renderTasks();
-    showToast(task.completed ? "✓ Task completed!" : "↺ Task reopened");
-    console.log(
-      "Task toggled:",
-      task.title,
-      task.completed ? "completed" : "active",
-    );
-  }
-}
-
-function saveEdit() {
-  const newTitle = editInput.value.trim();
-  if (!newTitle) {
-    showToast("Task cannot be empty", 1500);
-    return;
-  }
-
-  const task = tasks.find((t) => t.id === editingTaskId);
-  if (task) {
-    task.title = newTitle;
-    saveTasks();
-    renderTasks();
-    showToast("✎ Task updated");
-    console.log("Task updated:", task);
-  }
-  closeModal();
-}
-
-function clearCompleted() {
-  const completedTasks = tasks.filter((t) => t.completed);
-
-  if (completedTasks.length === 0) {
-    showToast("No completed tasks to clear", 1500);
-    return;
-  }
-
-  if (
-    confirm(
-      `Delete ${completedTasks.length} completed task${completedTasks.length > 1 ? "s" : ""}?`,
-    )
-  ) {
-    tasks = tasks.filter((t) => !t.completed);
-    saveTasks();
-    renderTasks();
-    updateStats();
-    showToast(
-      `Cleared ${completedTasks.length} task${completedTasks.length > 1 ? "s" : ""}`,
-    );
-    console.log(`Cleared ${completedTasks.length} completed tasks`);
-  }
-}
+loadTasks();
