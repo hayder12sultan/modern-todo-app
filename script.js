@@ -35,3 +35,62 @@ document.addEventListener('DOMContentLoaded', () => {
     
     console.log('App initialized with', tasks.length, 'tasks');
 });
+
+// Add new task
+function addTask() {
+    const title = taskInput.value.trim();
+    
+    if (!title) {
+        alert('Please enter a task');
+        return;
+    }
+    
+    const newTask = {
+        id: Date.now(),
+        title: title,
+        completed: false,
+        createdAt: new Date().toISOString(),
+        completedAt: null
+    };
+    
+    tasks.unshift(newTask); // Add to beginning of array
+    saveTasks();
+    renderTasks();
+    
+    taskInput.value = '';
+    taskInput.focus();
+    
+    console.log('Task added:', newTask);
+}
+
+// Render tasks to UI (placeholder)
+function renderTasks() {
+    console.log('Rendering tasks...');
+}
+
+// Set up event listeners
+function setupEventListeners() {
+    addBtn.addEventListener('click', addTask);
+    taskInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') addTask();
+    });
+}
+
+// Update DOMContentLoaded event listener
+document.addEventListener('DOMContentLoaded', () => {
+    // Get DOM elements
+    taskInput = document.getElementById('taskInput');
+    addBtn = document.getElementById('addBtn');
+    tasksContainer = document.getElementById('tasksContainer');
+    
+    // Load existing tasks
+    loadTasks();
+    
+    // Set up event listeners
+    setupEventListeners();
+    
+    // Initial render
+    renderTasks();
+    
+    console.log('App initialized with', tasks.length, 'tasks');
+});
