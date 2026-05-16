@@ -63,9 +63,33 @@ function addTask() {
     console.log('Task added:', newTask);
 }
 
-// Render tasks to UI (placeholder)
+
+// Render tasks to UI
 function renderTasks() {
-    console.log('Rendering tasks...');
+    if (!tasksContainer) return;
+    
+    if (tasks.length === 0) {
+        tasksContainer.innerHTML = `
+            <div class="empty-state">
+                <p>✨ No tasks yet</p>
+                <p style="font-size: 12px; margin-top: 8px;">Add your first task above</p>
+            </div>
+        `;
+        return;
+    }
+    
+    tasksContainer.innerHTML = tasks.map(task => `
+        <div class="task-card" data-id="${task.id}">
+            <span class="task-title">${escapeHtml(task.title)}</span>
+        </div>
+    `).join('');
+}
+
+// Helper function to escape HTML
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
 }
 
 // Set up event listeners
