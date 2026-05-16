@@ -153,3 +153,45 @@ function renderTasks() {
         </div>
     `).join('');
 }
+
+// Toggle complete status
+function toggleComplete(id) {
+    const task = tasks.find(t => t.id === id);
+    if (task) {
+        task.completed = !task.completed;
+        task.completedAt = task.completed ? new Date().toISOString() : null;
+        saveTasks();
+        renderTasks();
+        console.log('Task toggled:', task.title, task.completed ? 'completed' : 'active');
+    }
+}
+
+// Update renderTasks function
+function renderTasks() {
+    if (!tasksContainer) return;
+    
+    if (tasks.length === 0) {
+        tasksContainer.innerHTML = `
+            <div class="empty-state">
+                <p>✨ No tasks yet</p>
+                <p style="font-size: 12px; margin-top: 8px;">Add your first task above</p>
+            </div>
+        `;
+        return;
+    }
+    
+    tasksContainer.innerHTML = tasks.map(task => `
+        <div class="task-card ${task.completed ? 'completed' : ''}" data-id="${task.id}">
+            <div class="task-left">
+                <input type="checkbox" 
+                       class="task-checkbox" 
+                       ${task.completed ? 'checked' : ''} 
+                       onchange="toggleComplete(${task.id})">
+                <span class="task-title">${escapeHtml(task.title)}</span>
+            </div>
+            <div class="task-actions">
+                <button class="delete-btn" onclick="deleteTask(${task.id})">Delete</button>
+            </div>
+        </div>
+    `).join('');
+}
