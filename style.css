@@ -27,3 +27,63 @@ h1 {
     background-clip: text;
     color: transparent;
 }
+
+/* Existing styles plus: */
+
+.header {
+    margin-bottom: 30px;
+}
+
+.header p {
+    color: #8e8e93;
+    font-size: 14px;
+    margin-top: 5px;
+}
+
+.input-section {
+    margin-bottom: 30px;
+}
+
+.input-group {
+    display: flex;
+    gap: 12px;
+}
+
+.input-group input {
+    flex: 1;
+    padding: 14px 16px;
+    border: 1.5px solid #e5e5ea;
+    border-radius: 12px;
+    font-size: 16px;
+    font-family: inherit;
+    transition: all 0.2s;
+    background: #fafafc;
+}
+
+.input-group input:focus {
+    outline: none;
+    border-color: #007aff;
+    background: white;
+    box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
+}
+
+.input-group button {
+    padding: 14px 24px;
+    background: #007aff;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.input-group button:active {
+    transform: scale(0.98);
+}
+
+.tasks-container {
+    margin-top: 20px;
+}

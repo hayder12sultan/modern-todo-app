@@ -3,13 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TaskFlow - To-Do App</title>
+    <title>TaskFlow - Modern To-Do App</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="container">
-        <h1>TaskFlow</h1>
-        <p>Coming soon...</p>
+        <div class="header">
+            <h1>TaskFlow</h1>
+            <p>stay organized, stay productive</p>
+        </div>
+
+        <!-- Input Section -->
+        <div class="input-section">
+            <div class="input-group">
+                <input type="text" id="taskInput" placeholder="What needs to be done?">
+                <button id="addBtn">Add Task</button>
+            </div>
+        </div>
+
+        <div class="tasks-container" id="tasksContainer">
+            <!-- Tasks will appear here -->
+        </div>
     </div>
     <script src="script.js"></script>
 </body>
