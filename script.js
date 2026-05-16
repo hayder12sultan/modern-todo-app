@@ -537,3 +537,116 @@ document.addEventListener("DOMContentLoaded", () => {
 
   console.log("App initialized with", tasks.length, "tasks");
 });
+
+// Show toast notification
+function showToast(message, duration = 2000) {
+  const existingToast = document.querySelector(".toast");
+  if (existingToast) existingToast.remove();
+
+  const toast = document.createElement("div");
+  toast.className = "toast";
+  toast.textContent = message;
+  document.body.appendChild(toast);
+
+  setTimeout(() => {
+    toast.style.opacity = "0";
+    setTimeout(() => toast.remove(), 300);
+  }, duration);
+}
+
+// Add toast to all functions
+function addTask() {
+  const title = taskInput.value.trim();
+
+  if (!title) {
+    showToast("Please enter a task", 1500);
+    return;
+  }
+
+  const newTask = {
+    id: Date.now(),
+    title: title,
+    completed: false,
+    createdAt: new Date().toISOString(),
+    completedAt: null,
+  };
+
+  tasks.unshift(newTask);
+  saveTasks();
+  renderTasks();
+
+  taskInput.value = "";
+  taskInput.focus();
+
+  showToast("✓ Task added");
+  console.log("Task added:", newTask);
+}
+
+function deleteTask(id) {
+  const task = tasks.find((t) => t.id === id);
+  if (confirm("Delete this task?")) {
+    tasks = tasks.filter((task) => task.id !== id);
+    saveTasks();
+    renderTasks();
+    showToast(`🗑 Deleted "${task.title.substring(0, 30)}"`);
+    console.log(`Task deleted.`);
+  }
+}
+
+function toggleComplete(id) {
+  const task = tasks.find((t) => t.id === id);
+  if (task) {
+    task.completed = !task.completed;
+    task.completedAt = task.completed ? new Date().toISOString() : null;
+    saveTasks();
+    renderTasks();
+    showToast(task.completed ? "✓ Task completed!" : "↺ Task reopened");
+    console.log(
+      "Task toggled:",
+      task.title,
+      task.completed ? "completed" : "active",
+    );
+  }
+}
+
+function saveEdit() {
+  const newTitle = editInput.value.trim();
+  if (!newTitle) {
+    showToast("Task cannot be empty", 1500);
+    return;
+  }
+
+  const task = tasks.find((t) => t.id === editingTaskId);
+  if (task) {
+    task.title = newTitle;
+    saveTasks();
+    renderTasks();
+    showToast("✎ Task updated");
+    console.log("Task updated:", task);
+  }
+  closeModal();
+}
+
+function clearCompleted() {
+  const completedTasks = tasks.filter((t) => t.completed);
+
+  if (completedTasks.length === 0) {
+    showToast("No completed tasks to clear", 1500);
+    return;
+  }
+
+  if (
+    confirm(
+      `Delete ${completedTasks.length} completed task${completedTasks.length > 1 ? "s" : ""}?`,
+    )
+  ) {
+    tasks = tasks.filter((t) => !t.completed);
+    saveTasks();
+    renderTasks();
+    updateStats();
+    showToast(
+      `Cleared ${completedTasks.length} task${completedTasks.length > 1 ? "s" : ""}`,
+    );
+    console.log(`Cleared ${completedTasks.length} completed tasks`);
+  }
+}
