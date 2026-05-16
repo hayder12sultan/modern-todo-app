@@ -264,3 +264,33 @@ h1 {
 .edit-btn:active {
     transform: scale(0.95);
 }
+
+/* Tabs Styles */
+.tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 24px;
+}
+
+.tab {
+    flex: 1;
+    padding: 10px;
+    background: #f8f9fa;
+    border: none;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 500;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.2s;
+    color: #8e8e93;
+}
+
+.tab.active {
+    background: #007aff;
+    color: white;
+}
+
+.tab:active {
+    transform: scale(0.97);
+}

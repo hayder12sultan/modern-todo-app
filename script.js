@@ -302,3 +302,81 @@ document.addEventListener("DOMContentLoaded", () => {
 
   console.log("App initialized with", tasks.length, "tasks");
 });
+
+let currentFilter = "all";
+
+// Get filtered tasks based on current filter
+function getFilteredTasks() {
+  if (currentFilter === "active") {
+    return tasks.filter((t) => !t.completed);
+  }
+  if (currentFilter === "completed") {
+    return tasks.filter((t) => t.completed);
+  }
+  return tasks;
+}
+
+// Update renderTasks to use filtered tasks
+function renderTasks() {
+  if (!tasksContainer) return;
+
+  const filteredTasks = getFilteredTasks();
+
+  if (filteredTasks.length === 0) {
+    let message = "";
+    if (currentFilter === "active") message = "No active tasks";
+    else if (currentFilter === "completed") message = "No completed tasks";
+    else message = "No tasks yet";
+
+    tasksContainer.innerHTML = `
+            <div class="empty-state">
+                <p>✨ ${message}</p>
+                <p style="font-size: 12px; margin-top: 8px;">
+                    ${currentFilter === "all" ? "Add your first task above" : "Try another filter"}
+                </p>
+            </div>
+        `;
+    return;
+  }
+
+  tasksContainer.innerHTML = filteredTasks
+    .map(
+      (task) => `
+        <div class="task-card ${task.completed ? "completed" : ""}" data-id="${task.id}">
+            <div class="task-left">
+                <input type="checkbox" 
+                       class="task-checkbox" 
+                       ${task.completed ? "checked" : ""} 
+                       onchange="toggleComplete(${task.id})">
+                <span class="task-title">${escapeHtml(task.title)}</span>
+            </div>
+            <div class="task-actions">
+                <button class="edit-btn" onclick="editTask(${task.id})">Edit</button>
+                <button class="delete-btn" onclick="deleteTask(${task.id})">Delete</button>
+            </div>
+        </div>
+    `,
+    )
+    .join("");
+}
+
+// Set up tab switching
+function setupTabs() {
+  const tabs = document.querySelectorAll(".tab");
+  tabs.forEach((tab) => {
+    tab.addEventListener("click", () => {
+      tabs.forEach((t) => t.classList.remove("active"));
+      tab.classList.add("active");
+      currentFilter = tab.dataset.filter;
+      renderTasks();
+      console.log("Filter changed to:", currentFilter);
+    });
+  });
+}
+
+// Update DOMContentLoaded to include setupTabs
+document.addEventListener("DOMContentLoaded", () => {
+  // ... existing code
+  setupTabs();
+  // ... rest of code
+});
