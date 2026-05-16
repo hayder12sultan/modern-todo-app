@@ -383,70 +383,72 @@ document.addEventListener("DOMContentLoaded", () => {
 
 // Update getFilteredTasks to include history
 function getFilteredTasks() {
-    if (currentFilter === 'active') {
-        return tasks.filter(t => !t.completed);
-    }
-    if (currentFilter === 'completed') {
-        return tasks.filter(t => t.completed);
-    }
-    if (currentFilter === 'history') {
-        return tasks.filter(t => t.completed);
-    }
-    return tasks;
+  if (currentFilter === "active") {
+    return tasks.filter((t) => !t.completed);
+  }
+  if (currentFilter === "completed") {
+    return tasks.filter((t) => t.completed);
+  }
+  if (currentFilter === "history") {
+    return tasks.filter((t) => t.completed);
+  }
+  return tasks;
 }
 
 // Format date for display
 function formatDate(dateString) {
-    if (!dateString) return '';
-    const date = new Date(dateString);
-    const now = new Date();
-    const diffMs = now - date;
-    const diffMins = Math.floor(diffMs / 60000);
-    const diffHours = Math.floor(diffMs / 3600000);
-    const diffDays = Math.floor(diffMs / 86400000);
-    
-    if (diffMins < 1) return 'just now';
-    if (diffMins < 60) return `${diffMins} minute${diffMins > 1 ? 's' : ''} ago`;
-    if (diffHours < 24) return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
-    if (diffDays < 7) return `${diffDays} day${diffDays > 1 ? 's' : ''} ago`;
-    return date.toLocaleDateString();
+  if (!dateString) return "";
+  const date = new Date(dateString);
+  const now = new Date();
+  const diffMs = now - date;
+  const diffMins = Math.floor(diffMs / 60000);
+  const diffHours = Math.floor(diffMs / 3600000);
+  const diffDays = Math.floor(diffMs / 86400000);
+
+  if (diffMins < 1) return "just now";
+  if (diffMins < 60) return `${diffMins} minute${diffMins > 1 ? "s" : ""} ago`;
+  if (diffHours < 24) return `${diffHours} hour${diffHours > 1 ? "s" : ""} ago`;
+  if (diffDays < 7) return `${diffDays} day${diffDays > 1 ? "s" : ""} ago`;
+  return date.toLocaleDateString();
 }
 
 // Update renderTasks to show timestamps
 function renderTasks() {
-    if (!tasksContainer) return;
-    
-    const filteredTasks = getFilteredTasks();
-    
-    if (filteredTasks.length === 0) {
-        let message = '';
-        if (currentFilter === 'active') message = 'No active tasks';
-        else if (currentFilter === 'completed') message = 'No completed tasks';
-        else if (currentFilter === 'history') message = 'No task history';
-        else message = 'No tasks yet';
-        
-        tasksContainer.innerHTML = `
+  if (!tasksContainer) return;
+
+  const filteredTasks = getFilteredTasks();
+
+  if (filteredTasks.length === 0) {
+    let message = "";
+    if (currentFilter === "active") message = "No active tasks";
+    else if (currentFilter === "completed") message = "No completed tasks";
+    else if (currentFilter === "history") message = "No task history";
+    else message = "No tasks yet";
+
+    tasksContainer.innerHTML = `
             <div class="empty-state">
                 <p>✨ ${message}</p>
                 <p style="font-size: 12px; margin-top: 8px;">
-                    ${currentFilter === 'all' ? 'Add your first task above' : 'Try another filter'}
+                    ${currentFilter === "all" ? "Add your first task above" : "Try another filter"}
                 </p>
             </div>
         `;
-        return;
-    }
-    
-    tasksContainer.innerHTML = filteredTasks.map(task => {
-        const dateStr = task.completed && task.completedAt 
-            ? `Completed ${formatDate(task.completedAt)}`
-            : `Created ${formatDate(task.createdAt)}`;
-        
-        return `
-            <div class="task-card ${task.completed ? 'completed' : ''}" data-id="${task.id}">
+    return;
+  }
+
+  tasksContainer.innerHTML = filteredTasks
+    .map((task) => {
+      const dateStr =
+        task.completed && task.completedAt
+          ? `Completed ${formatDate(task.completedAt)}`
+          : `Created ${formatDate(task.createdAt)}`;
+
+      return `
+            <div class="task-card ${task.completed ? "completed" : ""}" data-id="${task.id}">
                 <div class="task-left">
                     <input type="checkbox" 
                            class="task-checkbox" 
-                           ${task.completed ? 'checked' : ''} 
+                           ${task.completed ? "checked" : ""} 
                            onchange="toggleComplete(${task.id})">
                     <div class="task-info">
                         <div class="task-title">${escapeHtml(task.title)}</div>
@@ -459,5 +461,79 @@ function renderTasks() {
                 </div>
             </div>
         `;
-    }).join('');
+    })
+    .join("");
 }
+
+let statsCount, clearCompletedBtn;
+
+// Update statistics
+function updateStats() {
+  const activeCount = tasks.filter((t) => !t.completed).length;
+  const totalCount = tasks.length;
+  statsCount.textContent = `${activeCount} active of ${totalCount} total`;
+}
+
+// Clear all completed tasks
+function clearCompleted() {
+  const completedTasks = tasks.filter((t) => t.completed);
+
+  if (completedTasks.length === 0) {
+    alert("No completed tasks to clear");
+    return;
+  }
+
+  if (
+    confirm(
+      `Delete ${completedTasks.length} completed task${completedTasks.length > 1 ? "s" : ""}?`,
+    )
+  ) {
+    tasks = tasks.filter((t) => !t.completed);
+    saveTasks();
+    renderTasks();
+    updateStats();
+    console.log(`Cleared ${completedTasks.length} completed tasks`);
+  }
+}
+
+// Update renderTasks to call updateStats
+function renderTasks() {
+  // ... existing render code
+  updateStats(); // Add this line
+}
+
+// Update DOMContentLoaded
+document.addEventListener("DOMContentLoaded", () => {
+  // Get DOM elements
+  taskInput = document.getElementById("taskInput");
+  addBtn = document.getElementById("addBtn");
+  tasksContainer = document.getElementById("tasksContainer");
+  editModal = document.getElementById("editModal");
+  editInput = document.getElementById("editInput");
+  closeModalBtn = document.getElementById("closeModalBtn");
+  saveEditBtn = document.getElementById("saveEditBtn");
+  statsCount = document.getElementById("statsCount");
+  clearCompletedBtn = document.getElementById("clearCompletedBtn");
+
+  // Load existing tasks
+  loadTasks();
+
+  // Set up event listeners
+  setupEventListeners();
+  setupTabs();
+
+  // Modal event listeners
+  closeModalBtn.addEventListener("click", closeModal);
+  saveEditBtn.addEventListener("click", saveEdit);
+  editModal.addEventListener("click", (e) => {
+    if (e.target === editModal) closeModal();
+  });
+
+  // Clear completed button
+  clearCompletedBtn.addEventListener("click", clearCompleted);
+
+  // Initial render
+  renderTasks();
+
+  console.log("App initialized with", tasks.length, "tasks");
+});
